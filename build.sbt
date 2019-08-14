@@ -38,9 +38,10 @@ lazy val settings =
 
 lazy val commonSettings =
   Seq(
-    scalaVersion := "2.13.0",
-    organization := "default",
-    organizationName := "chelebithil",
+    // scalaVersion from .travis.yml via sbt-travisci
+    // scalaVersion := "2.12.8",
+    organization := "io.metabookmarks",
+    organizationName := "Olivier NOUGUIER",
     startYear := Some(2019),
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
     scalacOptions ++= Seq(
@@ -54,6 +55,7 @@ lazy val commonSettings =
     ),
     Compile / unmanagedSourceDirectories := Seq((Compile / scalaSource).value),
     Test / unmanagedSourceDirectories := Seq((Test / scalaSource).value),
+    Compile / compile / wartremoverWarnings ++= Warts.unsafe,
 )
 
 lazy val scalafmtSettings =
