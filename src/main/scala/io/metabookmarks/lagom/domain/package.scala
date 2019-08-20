@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 chelebithil
+ * Copyright 2019 Olivier NOUGUIER
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package default.lagom
+package io.metabookmarks.lagom
 
-package object scalameta {
-
-  type Traversable[+A] = scala.collection.immutable.Traversable[A]
-  type Iterable[+A]    = scala.collection.immutable.Iterable[A]
-  type Seq[+A]         = scala.collection.immutable.Seq[A]
-  type IndexedSeq[+A]  = scala.collection.immutable.IndexedSeq[A]
+package object domain {
+  type Iterable[+A]   = scala.collection.immutable.Iterable[A]
+  type Seq[+A]        = scala.collection.immutable.Seq[A]
+  type IndexedSeq[+A] = scala.collection.immutable.IndexedSeq[A]
 }
