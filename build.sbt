@@ -27,9 +27,8 @@ lazy val `lagom-scalameta` =
     .enablePlugins(AutomateHeaderPlugin)
     .settings(settings)
     .settings(
-      libraryDependencies ++= Seq(
+      libraryDependencies ++=  Seq(
         library.scalameta,
-        library.playJson,
         library.scalaCheck % Test,
         library.scalaTest % Test,
       ) ++ {
@@ -57,7 +56,10 @@ lazy val library =
     val scalaCheck = "org.scalacheck" %% "scalacheck" % Version.scalaCheck
     val scalaTest = "org.scalatest" %% "scalatest" % Version.scalaTest
     val scalameta = "org.scalameta" %% "scalameta" % Version.scalameta
-    val playJson = "com.typesafe.play" %% "play-json" % "2.8.0-M5"
+    val playJson = Seq(
+      "com.typesafe.play" %% "play-json" % "2.8.0-M5",
+      "org.julienrf" %% "play-json-derived-codecs" % "6.0.0"
+    )
   }
 
 // *****************************************************************************
@@ -77,6 +79,15 @@ def crossFlags(scalaVersion: String) = CrossVersion.partialVersion(scalaVersion)
 
 }
 
+def crossPlugins(scalaVersion: String) = CrossVersion.partialVersion(scalaVersion) match {
+  case Some((2, 13)) =>
+    Nil
+  case Some((2, _)) =>
+    Seq(
+      compilerPlugin(("org.scalamacros" % "paradise" % "2.1.1").cross(CrossVersion.full)),
+      compilerPlugin(("org.typelevel" % "kind-projector" % "0.10.1").cross(CrossVersion.binary)))
+}
+
 lazy val commonSettings =
   Seq(
     // scalaVersion from .travis.yml via sbt-travisci
@@ -92,6 +103,7 @@ lazy val commonSettings =
     Compile / unmanagedSourceDirectories := Seq((Compile / scalaSource).value),
     Test / unmanagedSourceDirectories := Seq((Test / scalaSource).value),
     Compile / compile / wartremoverWarnings ++= Warts.allBut(Wart.Any, Wart.Nothing),
+    libraryDependencies ++= library.playJson
   )
 
 lazy val scalafmtSettings =
@@ -106,4 +118,6 @@ lazy val scalametaSettings =
 lazy val examples = project.in(file("examples"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.0-M5")
+  .settings(
+    libraryDependencies ++= crossPlugins(scalaVersion.value))
   .dependsOn(`lagom-scalameta`)

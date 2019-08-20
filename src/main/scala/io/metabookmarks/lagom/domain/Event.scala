@@ -22,7 +22,7 @@ import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
 import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
-import scala.util.{ Failure, Success, Try }
+import scala.util.Try
 
 @compileTimeOnly("@io.metabookmarks.lagom.domain.Event not expanded")
 class Event extends StaticAnnotation {
@@ -39,11 +39,9 @@ object EventMacro {
         val q"..$mods class $name[..$tparams] $tpcons(...$attr) extends { ..$earlydefns } with ..$parents { $self => ..$stats }" =
           classDecl
         (mods, name, attr, tparams, tpcons, earlydefns, parents, self, stats)
-      } match {
-        case Failure(_) =>
-          c.abort(c.enclosingPosition, "Annotation is only supported on objects")
-        case Success((mods, name, attr, tparams, tpcons, earlydefns, parents, self, stats)) =>
-          c.Expr(q"""
+      }.map {
+          case (mods, name, attr, tparams, tpcons, earlydefns, parents, self, stats) =>
+            c.Expr(q"""
             $mods class ${name.toTypeName}[..$tparams] $tpcons(...$attr) extends { ..$earlydefns } with ..$parents { $self => ..$stats }
             object ${name.toTermName} {
             import play.api.libs.json._
@@ -51,12 +49,33 @@ object EventMacro {
             }
 
             """)
-      }
+        }
+        .orElse(Try {
+          val q"..$mods trait $name[..$tparams] extends { ..$earlydefns } with ..$parents { $self => ..$stats }" =
+            classDecl
+          (mods, name, tparams, earlydefns, parents, self, stats)
+        }.map {
+          case (mods, name, tparams, earlydefns, parents, self, stats) =>
+            c.Expr(q"""
+            $mods trait ${name.toTypeName}[..$tparams]  extends { ..$earlydefns } with ..$parents { $self => ..$stats }
+            object ${name.toTermName} {
+            import play.api.libs.json._
+            import julienrf.json.derived
+            implicit val format: Format[${name.toTypeName}] =
+            derived.flat.oformat((__ \ "type").format[String])
+            }
+
+            """)
+        })
+        .getOrElse {
+          c.abort(c.enclosingPosition, "Annotation is only supported on objects")
+
+        }
 
     annottees.map(_.tree) match {
       case (classDecl: ClassDef) :: Nil =>
         modifiedClass(classDecl)
-      case _ => c.abort(c.enclosingPosition, "Invalid annottee")
+      case e => c.abort(c.enclosingPosition, s"Invalid annottee: $e")
     }
   }
 }
