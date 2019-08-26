@@ -29,6 +29,8 @@ name:= "scala-meta-project"
 
 publishArtifact := false
 
+publish := {}
+
 lazy val `lagom-scalameta` =
   project
     .in(file("library"))
@@ -99,6 +101,7 @@ def crossPlugins(scalaVersion: String) = CrossVersion.partialVersion(scalaVersio
 lazy val commonSettings =
   Seq(
     // scalaVersion from .travis.yml via sbt-travisci
+    bintrayRepository := "releases",
     scalacOptions ++= Seq(
       //      "-Xplugin-require:macroparadise",
       "-unchecked",
@@ -121,7 +124,8 @@ lazy val scalametaSettings =
   Seq()
 
 lazy val ijext = project.in(file("ijext"))
-  .settings(name := "lagom-scalameta-ijext")
+  .settings(name := "lagom-scalameta-ijext",
+    bintrayRepository := "releases")
   .enablePlugins(SbtIdeaPlugin)
   .dependsOn(`lagom-scalameta`).settings(
   ideaExternalPlugins += IdeaPlugin.Id("Scala", "org.intellij.scala", None),
@@ -134,6 +138,7 @@ lazy val examples = project.in(file("examples"))
   .settings(
     libraryDependencies ++= crossPlugins(scalaVersion.value))
   .settings(
-    publishArtifact := false
+    publishArtifact := false,
+    publish := {}
   )
   .dependsOn(`lagom-scalameta`)
