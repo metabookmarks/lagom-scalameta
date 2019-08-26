@@ -1,0 +1,23 @@
+<!DOCTYPE intellij-compat PUBLIC "Plugin/DTD"
+        "https://github.com/JetBrains/intellij-scala/raw/idea192.x/scala/scala-impl/src/org/jetbrains/plugins/scala/components/libextensions/intellij-compat.dtd">
+<intellij-compat>
+    <name>Lagom ScalaMeta support</name>
+    <id>io.metabookmarks.lagom.scalameta</id>
+    <description>This provides lagom scalameta support</description>
+    <version>0.0.9</version>
+    <vendor>MetaBookMarks</vendor>
+    <ideaVersion since-build="2019.2.0" until-build="2019.4.0">
+<!--        <extension interface="org.jetbrains.plugins.scala.lang.macros.evaluator.ScalaMacroTypeable"-->
+<!--                   implementation="org.jetbrains.scala.libextensions.test.MacroFooableSupport">-->
+<!--            <description>Support for genFoo macro</description>-->
+<!--        </extension>-->
+<!--        <extension interface="org.jetbrains.plugins.scala.lang.macros.evaluator.ScalaMacroExpandable"-->
+<!--                   implementation="org.jetbrains.scala.libextensions.test.MacroDynamicSupport">-->
+<!--            <description>Support for dynamic apply macro</description>-->
+<!--        </extension>-->
+        <extension interface="org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector"
+                   implementation="org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.LagomJsonScalaMetaInjector">
+            <description>Sample method injector</description>
+        </extension>
+    </ideaVersion>
+</intellij-compat>

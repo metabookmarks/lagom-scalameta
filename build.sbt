@@ -5,11 +5,13 @@
 inThisBuild(
   List(
     crossScalaVersions := List("2.12.9", "2.13.0"),
-    scalaVersion := "2.13.0",
+    scalaVersion := "2.12.9",
     organization := "io.metabookmarks",
     organizationName := "Olivier NOUGUIER",
     startYear := Some(2019),
     licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0")),
+    ideaBuild := "192.6262.58",
+    ideaPluginName := "lagom-scalameta-ijext",
     developers := List(
       Developer(
         "cheleb",
@@ -18,16 +20,22 @@ inThisBuild(
         url("https://github.com/cheleb"),
       ),
     ),
+    bintrayOrganization := Some("metabookmarks"),
+    bintrayRepository := "releases"
   ),
 )
 
+name:= "scala-meta-project"
+
+publishArtifact := false
+
 lazy val `lagom-scalameta` =
   project
-    .in(file("."))
+    .in(file("library"))
     .enablePlugins(AutomateHeaderPlugin)
     .settings(settings)
     .settings(
-      libraryDependencies ++=  Seq(
+      libraryDependencies ++= Seq(
         library.scalameta,
         library.scalaCheck % Test,
         library.scalaTest % Test,
@@ -100,10 +108,8 @@ lazy val commonSettings =
       "-encoding", "UTF-8",
     ) ++ crossFlags(scalaVersion.value),
     //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-    Compile / unmanagedSourceDirectories := Seq((Compile / scalaSource).value),
-    Test / unmanagedSourceDirectories := Seq((Test / scalaSource).value),
-    Compile / compile / wartremoverWarnings ++= Warts.allBut(Wart.Any, Wart.Nothing),
-    libraryDependencies ++= library.playJson
+    Compile / compile / wartremoverWarnings ++= Warts.allBut(Wart.Any, Wart.Nothing)
+    // libraryDependencies ++= library.playJson
   )
 
 lazy val scalafmtSettings =
@@ -114,10 +120,20 @@ lazy val scalafmtSettings =
 lazy val scalametaSettings =
   Seq()
 
+lazy val ijext = project.in(file("ijext"))
+  .settings(name := "lagom-scalameta-ijext")
+  .enablePlugins(SbtIdeaPlugin)
+  .dependsOn(`lagom-scalameta`).settings(
+  ideaExternalPlugins += IdeaPlugin.Id("Scala", "org.intellij.scala", None),
+  unmanagedJars in Compile += file("/Users/chelebithil/.lagom-scalameta-ijextPluginIC/sdk/192.6262.58//plugins/java/lib/java-api.jar")
+).aggregate(`lagom-scalameta`)
 
 lazy val examples = project.in(file("examples"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies += "com.typesafe.play" %% "play-json" % "2.8.0-M5")
+  .settings(libraryDependencies ++= library.playJson)
   .settings(
     libraryDependencies ++= crossPlugins(scalaVersion.value))
+  .settings(
+    publishArtifact := false
+  )
   .dependsOn(`lagom-scalameta`)
