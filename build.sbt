@@ -142,3 +142,18 @@ lazy val examples = project.in(file("examples"))
     publish := {}
   )
   .dependsOn(`lagom-scalameta`)
+
+import sbtrelease.ReleaseStateTransformations._
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  inquireVersions,
+  runClean,
+  releaseStepCommandAndRemaining("+ test"),
+  setReleaseVersion,
+  commitReleaseVersion,
+  tagRelease,
+  releaseStepCommandAndRemaining("+ publish"),
+  setNextVersion,
+  commitNextVersion,
+  pushChanges
+)
