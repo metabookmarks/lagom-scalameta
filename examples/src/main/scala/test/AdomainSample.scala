@@ -8,5 +8,9 @@ sealed trait Model {
 }
 
 @Event
-case class Person(name: String) extends Model
+final case class Person(name: String) extends Model
 
+object Person {
+  def apply(name: String): Person = new Person(name)
+  def ide(i: Int): Int = 1
+}

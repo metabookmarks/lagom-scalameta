@@ -4,7 +4,7 @@
     <name>Lagom ScalaMeta support</name>
     <id>io.metabookmarks.lagom.scalameta</id>
     <description>This provides lagom scalameta support</description>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
     <vendor>MetaBookMarks</vendor>
     <ideaVersion since-build="2019.2.0" until-build="2019.4.0">
 <!--        <extension interface="org.jetbrains.plugins.scala.lang.macros.evaluator.ScalaMacroTypeable"-->
